@@ -1,7 +1,7 @@
 #coding=utf-8
 
 from Util import *
-from huobi import HuobiService
+from huobi.HuobiService import *
 
 HuobiSpot=HuobiSpot(ACCESS_KEY, SECRET_KEY, HUOBI_SERVICE_API)
 

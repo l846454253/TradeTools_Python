@@ -12,7 +12,8 @@ class HuobiSpot:
         self.__ApiKey = vp_ApiKey
         self.__SecretKey = vp_SecretKey
         self.__BaseUrl = vp_BaseUrl
-
+        self.__HuobiBase = HuobiBase()
+        
     '''
     获取账号详情
     '''
@@ -21,6 +22,6 @@ class HuobiSpot:
         params = {}
 
         request_path = ACCOUNTS
-        return HuobiBase.api_key_post(self.__BaseUrl, request_path, params, self.__ApiKey, self.__SecretKey)
+        return self.__HuobiBase.api_key_get(self.__BaseUrl, request_path, params, self.__ApiKey, self.__SecretKey)
 
 

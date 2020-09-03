@@ -1,10 +1,14 @@
 #coding=utf-8
 
-#在此输入您的Key
-ACCESS_KEY="8d5c98ba-2cbb1b58-d999a85f-ez2xc4vb6n"
-SECRET_KEY="72976149-f2fc4e0c-251df332-94048"
+#read
+#ACCESS_KEY="830dff42-a4f50f57-b47945a8-1qdmpe4rty"
+#SECRET_KEY="0dfdf788-a5d6f3a0-b3647bee-cf804"
 
-HUOBI_SERVICE_API="https://api.huobi.pro"
+#trade
+ACCESS_KEY="dqnh6tvdf3-5210f80e-396ca701-335cb"
+SECRET_KEY="ce398b52-3515ebf7-65b03da3-e6a87"
+
+HUOBI_SERVICE_API="https://api.huobi.pro:443"
 
 ACCOUNTS = "/v1/account/accounts"
 

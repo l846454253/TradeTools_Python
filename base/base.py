@@ -21,9 +21,12 @@ TIMEOUT = 5
 class HttpBase:
     def __init__(self):
         self.logger = logging.getLogger("HttpBase")
+        self.logger.setLevel("DEBUG")
+        self.logger_console = logging.StreamHandler()
+        self.logger_console.setLevel("INFO")
 
     #各种请求,获取数据方式
-    def http_get_request(url, params, add_to_headers=None):
+    def http_get_request(self, url, params, add_to_headers=None):
         headers = {
             "Content-type": "application/x-www-form-urlencoded",
             'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'
@@ -42,7 +45,7 @@ class HttpBase:
             print("httpGet failed, detail is:%s" %e)
             return {"status":"fail","msg": "%s"%e}
 
-    def http_post_request(url, params, add_to_headers=None):
+    def http_post_request(self, url, params, add_to_headers=None):
         headers = {
             "Accept": "application/json",
             'Content-Type': 'application/json',
@@ -53,7 +56,7 @@ class HttpBase:
         postdata = json.dumps(params)
         try:
             response = requests.post(url, postdata, headers=headers, timeout=TIMEOUT)
-            self.logger.debug(response.url)
+            print(response.url)
             if response.status_code == 200:
                 return response.json()
             else:
@@ -66,8 +69,10 @@ class HttpBase:
 class HuobiBase:
     def __init__(self):
         self.logger = logging.getLogger("HuobiBase")
+        self.logger.setLevel("DEBUG")
+        self.__HttpBase = HttpBase()
 
-    def createSign(pParams, method, host_url, request_path, secret_key):
+    def createSign(self, pParams, method, host_url, request_path, secret_key):
         sorted_params = sorted(pParams.items(), key=lambda d: d[0], reverse=False)
         encode_params = urllib.parse.urlencode(sorted_params)
         payload = [method, host_url, request_path, encode_params]
@@ -79,10 +84,10 @@ class HuobiBase:
         signature = signature.decode()
         return signature
 
-    def api_key_get(url, request_path, params, ACCESS_KEY, SECRET_KEY):
+    def api_key_get(self, url, request_path, params, access_key, secret_key):
         method = 'GET'
         timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
-        params.update({'AccessKeyId': ACCESS_KEY,
+        params.update({'AccessKeyId': access_key,
                        'SignatureMethod': 'HmacSHA256',
                        'SignatureVersion': '2',
                        'Timestamp': timestamp})
@@ -92,26 +97,28 @@ class HuobiBase:
         host_name = urllib.parse.urlparse(host_url).hostname
         host_name = host_name.lower()
 
-        params['Signature'] = self.createSign(params, method, host_name, request_path, SECRET_KEY)
+        params['Signature'] = self.createSign(params, method, host_name, request_path, secret_key)
         url = host_url + request_path
-        return HttpBase.http_get_request(url, params)
+        return self.__HttpBase.http_get_request(url, params)
 
 
-    def api_key_post(url, request_path, params, ACCESS_KEY, SECRET_KEY):
+    def api_key_post(self, url, request_path, params, access_key, secret_key):
         method = 'POST'
         timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
-        params_to_sign = {'AccessKeyId': ACCESS_KEY,
+        params_to_sign = {'AccessKeyId': access_key,
                           'SignatureMethod': 'HmacSHA256',
                           'SignatureVersion': '2',
                           'Timestamp': timestamp}
+
+        print(params_to_sign)
 
         host_url = url
         #host_name = urlparse.urlparse(host_url).hostname
         host_name = urllib.parse.urlparse(host_url).hostname
         host_name = host_name.lower()
-        params_to_sign['Signature'] = self.createSign(params_to_sign, method, host_name, request_path, SECRET_KEY)
+        params_to_sign['Signature'] = self.createSign(params_to_sign, method, host_name, request_path, secret_key)
         url = host_url + request_path + '?' + urllib.parse.urlencode(params_to_sign)
-        return HttpBase.http_post_request(url, params)
+        return self.__HttpBase.http_post_request(url, params)
 
 
 
