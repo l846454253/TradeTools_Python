@@ -17,3 +17,12 @@ def ScheduleTimer(conf, callback, symbols, interval=1, ScheduleTime="00:00"):
         # 启动服务
         schedule.run_pending()
         time.sleep(1)
+
+def FileLoggingInit(file):
+    logger = logging.getLogger()
+    logger.setLevel(level = logging.INFO)
+    handler = logging.FileHandler(file)
+    handler.setLevel(logging.INFO)
+    logger.addHandler(handler)
+
+    return logger

@@ -10,6 +10,6 @@ SECRET_KEY="ce398b52-3515ebf7-65b03da3-e6a87"
 
 HUOBI_SERVICE_API="https://api.huobi.pro:443"
 
-ACCOUNTS = "/v1/account/accounts"
+AUTO_INVEST_LOG_FILE="./logs/AutomaticInvestment.log"
 
 
