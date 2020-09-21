@@ -1,0 +1,38 @@
+{
+	"conf": [{
+		"coin": "btc",
+		"base": "usdt",
+		"direct": "buy",
+		"limit": 10300,
+		"amount": 10,
+		"total_amount": 100,
+		"timer": [{
+			"type": 1,
+			"time": {
+				"sec": 0,
+				"min": 0,
+				"hour": 0,
+				"day": 0,
+				"week":0,
+				"mon": 0
+			}
+		}]
+	}, {
+		"coin": "eth",
+		"base": "usdt",
+		"direct": "buy",
+		"limit": 400,
+		"amount": 10,
+		"total_amount": 100,
+		"timer": [{
+			"type": 1,
+			"time": {
+				"sec": 0,
+				"min": 0,
+				"hour": 0,
+				"day": 0,
+				"mon": 0
+			}
+		}]
+	}]
+}

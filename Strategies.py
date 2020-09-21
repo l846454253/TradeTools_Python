@@ -93,23 +93,8 @@ def AutomaticInvestment(conf):
 '''
 定时器回调（每晚00:00触发）或推送最新价格时触发回调
 '''
-data='''
-{
-	"conf": [{
-		"coin": "btc",
-		"base": "usdt"
-		"limit": 10300,
-		"amount": 10,
-		"total_amount": 100
-		"time"
-	}, {
-		"coin": "eth",
-		"base": "usdt"
-		"limit": 400,
-		"amount": 10,
-		"total_amount": 100
-	}]
-}
+
+
 '''
 定投币种：
 开始定投时间：
@@ -143,3 +128,29 @@ def AutomaticInvestmentPrintTradeStart(conf):
         
     
 ScheduleTimer(data, AutomaticInvestment, "seconds")
+
+#作用：定时完成一次交易
+#生命周期：完成交易后终止
+def TimerForTrade():
+
+
+#作用：启动定时器
+#生命周期：直到定投任务完成
+def ThreadWork():
+    #解析定投信息，启动定时器
+
+#作用：负责开启任务线程
+#生命周期：直到程序被杀死
+def ThreadConfigureScanner():
+    # 循环遍历每个币种
+        #判断配置文件定投开关是否打开
+            #打开则判断该币种的定投线程是否还在工作
+                #还在工作，则跳过
+                #未工作，准备启动
+        #若是关闭或暂停状态，则跳过
+
+    #启动定投线程，线程里面开定时器，定时器里面继续扫描配置，实时操作，每次操作必须同步参数计数
+
+
+def AutomaticInvestmentTradeStart(conf_path):
+    #启动配置文件扫描线程
