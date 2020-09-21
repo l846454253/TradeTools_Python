@@ -1,5 +1,6 @@
 {
 	"conf": [{
+		"status":1,
 		"coin": "btc",
 		"base": "usdt",
 		"direct": "buy",
@@ -18,6 +19,7 @@
 			}
 		}]
 	}, {
+		"status":1,
 		"coin": "eth",
 		"base": "usdt",
 		"direct": "buy",

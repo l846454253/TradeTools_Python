@@ -1,5 +1,8 @@
 import time
 import schedule
+import threading
+import json
+import logging
 
 def ScheduleTimer(conf, callback, symbols, interval=1, ScheduleTime="00:00"):
     schedule.clear()
@@ -26,3 +29,15 @@ def FileLoggingInit(file):
     logger.addHandler(handler)
 
     return logger
+
+def JsonFileLoad(file):
+    with open(file) as json_file:
+        try:
+            data = json.load(json_file)
+        except:
+            data = {}
+        return data    
+
+def ThreadCreate(func, parm):
+    t = threading.Thread(target=func, args=parm)
+    t.start()

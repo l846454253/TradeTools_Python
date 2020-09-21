@@ -1,14 +1,14 @@
 from System import *
 from Util import *
-from huobi import RequestClient
-from huobi.model import Account
+#from huobi import RequestClient
+#from huobi.model import Account
 import json
 import logging
 
 '''
  普通定投（指定区间（可选）， 指定周期（可选）， 指定定投总资金（可选）， 指定每次定投的资金量（必选））
  支持多个币种定投， 通过配置文件进行配置
-'''
+
 def GetSpotAccountBalances(coin):
     request_client = RequestClient(api_key=ACCESS_KEY, secret_key=SECRET_KEY)
     account_balance_list = request_client.get_account_balance()
@@ -20,10 +20,10 @@ def GetSpotAccountBalances(coin):
                         if balance.currency == coin and balance.balance_type == "trade":
                             return balance.balance
 
-'''
+
 回调方法 交易前准备工作
 如果没交易成功，如何处理，轮询还是如何
-'''
+
 def AutomaticInvestment(conf):
     dict=json.loads(conf)
 
@@ -36,7 +36,7 @@ def AutomaticInvestment(conf):
         total_amount = conf["total_amount"] #可选
 
         # 获取指数价格 是否在定投区间
-        '''
+        
         Timestamp : 1599408134086
         Open : 10269.24     24h前的价格
         Close : 10156.84    当前价格
@@ -45,7 +45,7 @@ def AutomaticInvestment(conf):
         Low : 9834.77   24h最低价
         Count : 830654
         Volume : 749859976.568394
-        '''
+        
         request_client = RequestClient(api_key=ACCESS_KEY, secret_key=SECRET_KEY)
         trade_statistics = request_client.get_24h_trade_statistics(coin+base)
         cur_price=trade_statistics.close
@@ -90,12 +90,12 @@ def AutomaticInvestment(conf):
 
 
 
-'''
+
 定时器回调（每晚00:00触发）或推送最新价格时触发回调
-'''
 
 
-'''
+
+
 定投币种：
 开始定投时间：
 预计结束时间：
@@ -104,7 +104,7 @@ def AutomaticInvestment(conf):
 定投周期：
 每次定投金额：
 总投资金额：
-'''
+
 def AutomaticInvestmentPrintTradeStart(conf):
     logger=FileLoggingInit(AUTO_INVEST_LOG_FILE)
     logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -128,21 +128,38 @@ def AutomaticInvestmentPrintTradeStart(conf):
         
     
 ScheduleTimer(data, AutomaticInvestment, "seconds")
-
+'''
 #作用：定时完成一次交易
 #生命周期：完成交易后终止
 def TimerForTrade():
-
+    pass
+    #开启交易
+    #打印交易信息
+    #交易
+    #出错处理
 
 #作用：启动定时器
 #生命周期：直到定投任务完成
 def ThreadWork():
+    pass
     #解析定投信息，启动定时器
+        #判断开关是否打开
+            #非打开状态，退出
+            #打开状态，继续
+        #判断条件
+            #是否达成定投目标
+            #达成则终止线程   
+    #启动定时器
 
 #作用：负责开启任务线程
 #生命周期：直到程序被杀死
-def ThreadConfigureScanner():
+def ThreadConfigureScanner(*args):
+    dict=JsonFileLoad(args[0])
     # 循环遍历每个币种
+    for conf in dict["conf"]:
+        status=conf["status"]
+        
+        print(conf)
         #判断配置文件定投开关是否打开
             #打开则判断该币种的定投线程是否还在工作
                 #还在工作，则跳过
@@ -154,3 +171,8 @@ def ThreadConfigureScanner():
 
 def AutomaticInvestmentTradeStart(conf_path):
     #启动配置文件扫描线程
+    ThreadCreate(ThreadConfigureScanner,(conf_path,))
+
+AutomaticInvestmentTradeStart(AUTO_INVEST_CONF_FILE)
+
+
