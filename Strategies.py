@@ -1,7 +1,7 @@
 from System import *
 from Util import *
-#from huobi import RequestClient
-#from huobi.model import Account
+# from huobi import RequestClient
+# from huobi.model import Account
 import json
 import logging
 
@@ -129,19 +129,94 @@ def AutomaticInvestmentPrintTradeStart(conf):
     
 ScheduleTimer(data, AutomaticInvestment, "seconds")
 '''
-#作用：定时完成一次交易
-#生命周期：完成交易后终止
-def TimerForTrade():
-    pass
-    #开启交易
-    #打印交易信息
-    #交易
-    #出错处理
 
-#作用：启动定时器
-#生命周期：直到定投任务完成
-def ThreadWork():
+
+# 作用：定时完成一次交易
+# 生命周期：完成交易后终止
+def TimerForTrade(conf):
+    print('hello')
     pass
+    # 开启交易
+    # 打印交易信息
+    # 交易
+    # 出错处理
+
+
+'''
+type1
+总量 / 每次 = 次数
+次数 * 间隔 = 总时间
+
+给出的情况：（总时间无法给出）
+总量，每次，间隔
+次数，总量，间隔
+次数，每次，间隔
+
+种参数同时出现时，处理如下：
+优先度：总量 > 每次 > 间隔 > 次数
+总量，每次，间隔
+次数，总量，间隔
+次数，每次，间隔
+'''
+# 启动定投线程，线程里面开定时器，定时器里面继续扫描配置，实时操作，每次操作必须同步参数计数
+
+# 作用：启动定时器
+# 生命周期：直到定投任务完成
+def ThreadWork(*args):
+    while True:
+        print("start")
+        JsonContext = JsonFileLoad(args[0])
+        # 循环遍历每个币种
+        for conf in JsonContext["conf"]:
+            coin = conf["coin"]
+            base = conf["base"]
+            status = conf["status"]
+            coinbase = str(coin + base)
+            isThreadOn = False
+
+            # 判断配置文件定投开关是否打开
+            if status == TradeStatus.ON:
+                # 打开则判断该币种的定投线程是否还在工作
+                if threading.current_thread.__name__ == coinbase:
+                    isThreadOn = True
+                    break
+
+        if isThreadOn == False:
+            threading.current_thread.
+        print("end")
+        time.sleep(1)
+'''     
+    #解析json
+    amount = conf["amount"]
+    total_amount = conf["total_amount"]
+    times = conf["times"]
+    for timer in conf["timer"]:
+        timer_type = timer["type"]
+        time = timer["time"]
+        if timer_type == 1:   #定投间隔
+            str = "%2d:%2d:%2d:%2d:%2d:%2d" % (
+            time["mon"], time["week"], time["day"], time["hour"], time["min"], time["sec"])
+            time_interval = Time2Sec(str)
+            if time_interval:
+                ScheduleTimer(conf, TimerForTrade, "seconds", time_interval)
+        elif timer_type == 2: #指定周期内具体某个时间定投
+            if time["mon"]:
+               pass
+        elif timer_type == 3: #指定时间内定投完毕
+            pass
+'''
+
+'''
+if type == 0:
+    if total_amount and amount and interval:
+
+    elif total_amount and times and interval:
+
+    elif amount and times and interval:
+
+    else:
+    #这里只启动定时器，是否符合定投条件不在这里判断
+
     #解析定投信息，启动定时器
         #判断开关是否打开
             #非打开状态，退出
@@ -150,29 +225,39 @@ def ThreadWork():
             #是否达成定投目标
             #达成则终止线程   
     #启动定时器
+'''
 
-#作用：负责开启任务线程
-#生命周期：直到程序被杀死
+
+# 作用：负责开启任务线程
+# 生命周期：直到程序被杀死
 def ThreadConfigureScanner(*args):
-    dict=JsonFileLoad(args[0])
-    # 循环遍历每个币种
-    for conf in dict["conf"]:
-        status=conf["status"]
-        
-        print(conf)
-        #判断配置文件定投开关是否打开
-            #打开则判断该币种的定投线程是否还在工作
-                #还在工作，则跳过
-                #未工作，准备启动
-        #若是关闭或暂停状态，则跳过
+    while True:
+        JsonContext = JsonFileLoad(args[0])
+        # 循环遍历每个币种
+        for conf in JsonContext["conf"]:
+            coin = conf["coin"]
+            base = conf["base"]
+            status = conf["status"]
+            coinbase = str(coin + base)
+            isThreadOn = False
 
-    #启动定投线程，线程里面开定时器，定时器里面继续扫描配置，实时操作，每次操作必须同步参数计数
+            # 判断配置文件定投开关是否打开
+            if status == TradeStatus.ON:
+                # 打开则判断该币种的定投线程是否还在工作
+                for i in threading.enumerate():
+                    if i.name == coinbase:
+                        isThreadOn = True
+
+                # 未工作，准备启动
+                if isThreadOn == False:
+                    ThreadCreate(ThreadWork, (args[0],), coinbase)
+
+        time.sleep(1)
 
 
 def AutomaticInvestmentTradeStart(conf_path):
-    #启动配置文件扫描线程
-    ThreadCreate(ThreadConfigureScanner,(conf_path,))
+    # 启动配置文件扫描线程
+    ThreadCreate(ThreadConfigureScanner, (conf_path,))
+
 
 AutomaticInvestmentTradeStart(AUTO_INVEST_CONF_FILE)
-
-
