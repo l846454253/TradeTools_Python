@@ -11,7 +11,7 @@
 		"timer": [{
 			"type": 1,
 			"time": {
-				"sec": 0,
+				"sec": 1,
 				"min": 0,
 				"hour": 0,
 				"day": 0,
@@ -20,7 +20,7 @@
 			}
 		}]
 	}, {
-		"status":1,
+		"status":0,
 		"coin": "eth",
 		"base": "usdt",
 		"direct": "buy",

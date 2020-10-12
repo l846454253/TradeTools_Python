@@ -163,69 +163,88 @@ type1
 # 作用：启动定时器
 # 生命周期：直到定投任务完成
 def ThreadWork(*args):
+    TimerRunFlag = False
+    TimerIntervalRecord = 0;
+
     while True:
-        print("start")
         JsonContext = JsonFileLoad(args[0])
         # 循环遍历每个币种
         for conf in JsonContext["conf"]:
             coin = conf["coin"]
             base = conf["base"]
             status = conf["status"]
-            coinbase = str(coin + base)
+            coinbase = coin + base
             isThreadOn = False
 
-            # 判断配置文件定投开关是否打开
-            if status == TradeStatus.ON:
-                # 打开则判断该币种的定投线程是否还在工作
-                if threading.current_thread.__name__ == coinbase:
-                    isThreadOn = True
-                    break
+            # 打开则判断该币种的定投线程是否还在工作
+            if threading.current_thread().getName() == coinbase:
+                isThreadOn = True
+                break
+
+        # 判断配置文件定投开关是否打开
+        if status == TradeStatus.ON:
+            pass
+        elif status == TradeStatus.OFF:   
+            isThreadOn = False
+        elif status == TradeStatus.SUSPEND:   #暂停，线程不结束
+            schedule.clear(threading.current_thread().getName())
+            TimerRunFlag = False
+            continue
+        else:
+            isThreadOn = False
 
         if isThreadOn == False:
-            threading.current_thread.
-        print("end")
+            schedule.clear(threading.current_thread().getName())
+            return 
+            
+        #解析json
+        amount = conf["amount"]
+        total_amount = conf["total_amount"]
+        times = conf["times"]
+        for timer in conf["timer"]:
+            timer_type = timer["type"]
+            Time = timer["time"]
+            if timer_type == 1:   #定投间隔
+                str = "%2d:%2d:%2d:%2d:%2d:%2d" % (
+                Time["mon"], Time["week"], Time["day"], Time["hour"], Time["min"], Time["sec"])
+                time_interval = Time2Sec(str, timer_type)
+                if time_interval:
+                    if TimerIntervalRecord != time_interval or TimerRunFlag == False:
+                        schedule.clear(coinbase)    #取消上次任务
+                        ScheduleTimer(args[0], TimerForTrade, "seconds", time_interval, Tag=coinbase)
+                        TimerRunFlag = True #表示任务已添加，不能重复添加任务
+                        TimerIntervalRecord = time_interval
+                else:
+                    schedule.clear(coinbase)    #取消上次任务
+                    
+            elif timer_type == 2: #指定周期内具体某个时间定投
+                if Time["mon"]:
+                   pass
+            elif timer_type == 3: #指定时间内定投完毕
+                pass
+                
         time.sleep(1)
-'''     
-    #解析json
-    amount = conf["amount"]
-    total_amount = conf["total_amount"]
-    times = conf["times"]
-    for timer in conf["timer"]:
-        timer_type = timer["type"]
-        time = timer["time"]
-        if timer_type == 1:   #定投间隔
-            str = "%2d:%2d:%2d:%2d:%2d:%2d" % (
-            time["mon"], time["week"], time["day"], time["hour"], time["min"], time["sec"])
-            time_interval = Time2Sec(str)
-            if time_interval:
-                ScheduleTimer(conf, TimerForTrade, "seconds", time_interval)
-        elif timer_type == 2: #指定周期内具体某个时间定投
-            if time["mon"]:
-               pass
-        elif timer_type == 3: #指定时间内定投完毕
-            pass
-'''
 
-'''
-if type == 0:
-    if total_amount and amount and interval:
+    '''
+    if type == 0:
+        if total_amount and amount and interval:
 
-    elif total_amount and times and interval:
+        elif total_amount and times and interval:
 
-    elif amount and times and interval:
+        elif amount and times and interval:
 
-    else:
-    #这里只启动定时器，是否符合定投条件不在这里判断
+        else:
+        #这里只启动定时器，是否符合定投条件不在这里判断
 
-    #解析定投信息，启动定时器
-        #判断开关是否打开
-            #非打开状态，退出
-            #打开状态，继续
-        #判断条件
-            #是否达成定投目标
-            #达成则终止线程   
-    #启动定时器
-'''
+        #解析定投信息，启动定时器
+            #判断开关是否打开
+                #非打开状态，退出
+                #打开状态，继续
+            #判断条件
+                #是否达成定投目标
+                #达成则终止线程   
+        #启动定时器
+    '''
 
 
 # 作用：负责开启任务线程
@@ -250,7 +269,11 @@ def ThreadConfigureScanner(*args):
 
                 # 未工作，准备启动
                 if isThreadOn == False:
+                    print("create")
                     ThreadCreate(ThreadWork, (args[0],), coinbase)
+
+        # 启动定时器任务
+        schedule.run_pending()
 
         time.sleep(1)
 

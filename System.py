@@ -5,22 +5,15 @@ import json
 import logging
 
 
-def ScheduleTimer(conf, callback, symbols, interval=1, ScheduleTime="00:00"):
-    schedule.clear()
-
+def ScheduleTimer(Parm, callback, symbols, interval=1, Tag=None, ScheduleTime="00:00"):
     if symbols == "seconds":
-        schedule.every(interval).seconds.do(callback, conf)
+        schedule.every(interval).seconds.do(callback, Parm).tag(Tag)
     if symbols == "minutes":
-        schedule.every(interval).minutes.do(callback, conf)
+        schedule.every(interval).minutes.do(callback, Parm).tag(Tag)
     if symbols == "hour":
-        schedule.every(interval).hour.do(callback, conf)
+        schedule.every(interval).hour.do(callback, Parm).tag(Tag)
     if symbols == "day":
-        schedule.every(interval).day.at(ScheduleTime).do(callback, conf)
-
-    # 启动服务
-    schedule.run_pending()
-    time.sleep(1)
-
+        schedule.every(interval).day.at(ScheduleTime).do(callback, Parm).tag(Tag)
 
 def FileLoggingInit(file):
     logger = logging.getLogger()
@@ -50,7 +43,7 @@ def ThreadCreate(func, parm, name=None):
 
 
 # 时间转换接口
-def Time2Sec(Time):
+def Time2Sec(Time,Type):
     mon, week, day, hour, min, sec = Time.strip().split(":")
     Sec = int(mon) * 30 * 24 * 60 * 60 + int(week) * 7 * 24 * 60 * 60 + int(day) * 24 * 60 * 60 + int(hour) * 60 * 60 + int(min) * 60 + int(sec)
     return Sec
